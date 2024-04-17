@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-const version = "v1.2"
+const version = "v1.3"
 
 func main() {
 	// Handle command-line arguments
@@ -44,15 +44,15 @@ Instructions:
 . stop the program
 < move left on the tape
 > move right on the tape
-/ divide by 2 (only new)
+/ divide by 2 (only enhanced)
 - decrement cell value
 , input random value into cell
 + increment cell value
 * multiply by 2 (only enhanced)
-[ skip until 1 (enhanced) or go to to matching repeat (original)
+[ skip until 1 (enhanced) or go to matching repeat (original)
 ( skip until 2 (only enhanced)
 { skip until 3 (only enhanced)
-] repeat until 1 (enhanced) or go to to matching skip (original)
+] repeat until 1 (enhanced) or go to matching skip (original)
 ) repeat until 2 (only enhanced)
 } repeat until 3 (only enhanced)
 
