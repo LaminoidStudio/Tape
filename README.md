@@ -9,7 +9,7 @@ but it can be used in own projects too, as long as a compatible runtime is provi
 The toolchain supports all major platforms including macOS, Linux and Windows.
 
 ## Instruction set
-All opcodes are four bits wide and two opcodes are packed into one byte.
+All opcodes are four bits wide and two opcodes are packed into one byte. The low nibble precedes the high one.
 If a program has an odd number of opcodes, the last one can be padded with the halt opcode.
 The packing used results in 50% to 75% space savings compared to regular ASCII Brainfuck, if not more, as comments are removed.
 
