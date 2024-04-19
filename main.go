@@ -22,23 +22,27 @@ func main() {
 	)
 	flag.StringVar(&input, "input", input, "the input file name instead of stdin")
 	flag.StringVar(&output, "output", output, "the output file name instead of stdout")
-	flag.IntVar(&memory, "memory", memory, "the size of the tape in bytes")
+	flag.IntVar(&memory, "memory", memory, "the length of the tape in bytes")
 	flag.Int64Var(&seed, "seed", seed, "predictable random number seed over randomness")
-	flag.BoolVar(&compile, "compile", compile, "input source code over bytecode")
-	flag.BoolVar(&decompile, "decompile", decompile, "output source code over bytecode")
+	flag.BoolVar(&compile, "compile", compile, "input source code instead of bytecode")
+	flag.BoolVar(&decompile, "decompile", decompile, "output commented source code over bytecode")
 	flag.BoolVar(&original, "original", original, "whether to use original brainfuck syntax")
 	flag.BoolVar(&run, "run", run, "whether to run the program")
-	flag.BoolVar(&step, "step", step, "whether to log after every step")
+	flag.BoolVar(&step, "step", step, "whether to log every program step")
 	flag.Usage = func() {
 		_, _ = fmt.Fprintln(flag.CommandLine.Output(), "Laminoid Tape Compiler & VM", version)
 		_, _ = fmt.Fprintln(flag.CommandLine.Output(), `(c) Laminoid Studio (Muessig & Muessig GbR), 2024
 
 Description:
-Laminoid Tape compiler produces byte-code programs from brainfuck-like programs.
-It can also run and single-step, as well as decompile and explain them.
-Both original brainfuck, as well as an enhanced version can be used.
-The new version does not support unknown punctuation or symbol characters.
-Only three levels of nesting can be used in original brainfuck mode.
+ Laminoid Tape compiles efficient bytecode programs from brainfuck-like source.
+ It can also run and single-step, as well as decompile and explain them.
+ Both original brainfuck, as well as an enhanced version can be used.
+ The enhanced version doesn't support unknown punctuation or symbol characters.
+ Only three levels of nesting can be used in original brainfuck mode.
+ No strictly matched nesting is required in the enhanced mode.
+ Regular numbers, letters and whitespace are ignored in both modes.
+ All tape cells are unsigned 8-bit integers that wrap.
+ When running while not decompiling, the output is disabled.
 
 Instructions:
 . stop the program
@@ -49,12 +53,23 @@ Instructions:
 , input random value into cell
 + increment cell value
 * multiply by 2 (only enhanced)
-[ skip until 1 (enhanced) or go to matching repeat (original)
-( skip until 2 (only enhanced)
-{ skip until 3 (only enhanced)
-] repeat until 1 (enhanced) or go to matching skip (original)
-) repeat until 2 (only enhanced)
-} repeat until 3 (only enhanced)
+[ if cell is zero, skip until 1 (enhanced) or to matching repeat (original)
+( if cell is zero, skip until 2 (only enhanced)
+{ if cell is zero, skip until 3 (only enhanced)
+] if cell is non-zero, repeat until 1 (enhanced) or to matching skip (original)
+) if cell is non-zero, repeat until 2 (only enhanced)
+} if cell is non-zero, repeat until 3 (only enhanced)
+
+Encoding:
+ Two opcodes encoded per byte, where the low nibble precedes the high nibble.
+ At the end of the program, padding can be added with the output opcode (zero).
+
+Opcodes:
+ Output (0), Left (1), Right (2), Divide (3),
+ DecrementTwo (4), DecrementOne (5), Input (6),
+ IncrementOne (7), IncrementTwo (8), Multiply (9),
+ RepeatOne (10), RepeatTwo (11), RepeatThree (12),
+ SkipOne (13), SkipTwo (14), SkipThree (15)
 
 Usage:`)
 		flag.PrintDefaults()
