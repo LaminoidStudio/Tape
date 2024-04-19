@@ -28,17 +28,17 @@ func main() {
 	flag.BoolVar(&decompile, "decompile", decompile, "output source code over bytecode")
 	flag.BoolVar(&original, "original", original, "whether to use original brainfuck syntax")
 	flag.BoolVar(&run, "run", run, "whether to run the program")
-	flag.BoolVar(&step, "step", step, "whether to log after every step")
+	flag.BoolVar(&step, "step", step, "whether to log after every program step")
 	flag.Usage = func() {
 		_, _ = fmt.Fprintln(flag.CommandLine.Output(), "Laminoid Tape Compiler & VM", version)
 		_, _ = fmt.Fprintln(flag.CommandLine.Output(), `(c) Laminoid Studio (Muessig & Muessig GbR), 2024
 
 Description:
-Laminoid Tape compiler produces byte-code programs from brainfuck-like programs.
-It can also run and single-step, as well as decompile and explain them.
-Both original brainfuck, as well as an enhanced version can be used.
-The new version does not support unknown punctuation or symbol characters.
-Only three levels of nesting can be used in original brainfuck mode.
+ Laminoid Tape compiler produces byte-code programs from brainfuck-like programs.
+ It can also run and single-step, as well as decompile and explain them.
+ Both original brainfuck, as well as an enhanced version can be used.
+ The new version does not support unknown punctuation or symbol characters.
+ Only three levels of nesting can be used in original brainfuck mode.
 
 Instructions:
 . stop the program
@@ -55,6 +55,17 @@ Instructions:
 ] repeat until 1 (enhanced) or go to matching skip (original)
 ) repeat until 2 (only enhanced)
 } repeat until 3 (only enhanced)
+
+Encoding:
+ Two opcodes are encoded in one byte, where the low nibble precedes the high nibble.
+ At the end of the program, padding can be added with the output opcode (zero).
+
+Opcodes:
+ Output (0), Left (1), Right (2), Divide (3),
+ DecrementTwo (4), DecrementOne (5), Input (6),
+ IncrementOne (7), IncrementTwo (8), Multiply (9),
+ RepeatOne (10), RepeatTwo (11), RepeatThree (12),
+ SkipOne (13), SkipTwo (14), SkipThree (15)
 
 Usage:`)
 		flag.PrintDefaults()
