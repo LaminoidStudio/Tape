@@ -6,8 +6,9 @@ type Tape struct {
 }
 
 func (t *Tape) Move(distance int) {
+	s := len(t.Cells)
 	t.Pointer += distance
-	t.Pointer %= len(t.Cells)
+	t.Pointer = (t.Pointer%s + s) % s
 }
 
 func (t *Tape) Adjust(offset int) {
