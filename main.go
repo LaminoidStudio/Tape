@@ -9,13 +9,13 @@ import (
 	"os"
 )
 
-const version = "v1.3"
+const version = "v1.4"
 
 func main() {
 	// Handle command-line arguments
 	var (
 		input, output string
-		memory        = 5
+		memory        = 8
 		seed          int64
 		compile, decompile,
 		original, run, step bool
