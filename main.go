@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-const version = "v1.4"
+const version = "v1.5"
 
 func main() {
 	// Handle command-line arguments
