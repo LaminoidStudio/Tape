@@ -1,6 +1,6 @@
 # Laminoid Tape
 Laminoid Tape is a complete toolchain for original and modified Brainfuck development.
-Included is a compiler that compiles programs to bytecode, a runtime that can run from source- or bytecode
+Included is a compiler that compiles programs to bytecode, a runtime that can run from sourcecode or bytecode
 and a decompiler to turn bytecode back to commented source code.
 
 It was initially developed for our tape machine interactive business cards to help us write, debug and compile programs,
@@ -18,6 +18,10 @@ The below opcodes are available:
 ![Laminoid Tape instruction set](instructions.png)
 
 The color field indicates the LED brightness used when displaying the instruction on our business card.
+
+## Tape values
+The tape consists of a configurable length of 8-bit integers that are by default unsigned, however a signed mode is available.
+All instructions respect the signedness and behave correctly (divide performs sign extension and conditionals check for negative numbers).
 
 ## Enhanced Brainfuck
 The enhanced version of Brainfuck available with Tape adds three levels of unmatched jumps through the three sets of parantheses `[]{}()`.
@@ -40,12 +44,12 @@ Original Brainfuck support is provided and almost all operations are as defined 
 - `,` input random value into cell
 - `+` increment cell value
 - `*` multiply by 2 (only enhanced)
-- `[` skip until 1 (enhanced) or go to matching repeat (original)
-- `(` skip until 2 (only enhanced)
-- `{` skip until 3 (only enhanced)
-- `]` repeat until 1 (enhanced) or go to matching skip (original)
-- `)` repeat until 2 (only enhanced)
-- `}` repeat until 3 (only enhanced)
+- `[` skip until 1 if cell <= 0 (enhanced) or go to matching repeat (original)
+- `(` skip until 2 if cell <= 0 (only enhanced)
+- `{` skip until 3 if cell <= 0 (only enhanced)
+- `]` repeat until 1 if cell > 0 (enhanced) or go to matching skip (original)
+- `)` repeat until 2 if cell > 0 (only enhanced)
+- `}` repeat until 3 if cell > 0 (only enhanced)
 
 ## Usage
 The toolchain follows a simple `input -> processing -> output` pipeline model.
@@ -69,6 +73,7 @@ If an input file path is set, it is used instead of standard in. Tape can be use
 In this stage, you can optionally run the opcodes obtained in the input stage.
 The size of the tape can be set via memory, as well as an optional seed if you want predictable input values.
 If you enable step mode, you will be provided a step-by-step output of your program running.
+It is also possible to enabled signed mode, which branches for negative numbers and changes the number display.
 ```
   -run
         whether to run the program
@@ -76,6 +81,8 @@ If you enable step mode, you will be provided a step-by-step output of your prog
         the size of the tape in bytes (default 5)
   -seed int
         predictable random number seed over randomness
+  -signed
+    	whether the tape cells are signed integers
   -step
         whether to log after every step
 ```
