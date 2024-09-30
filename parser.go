@@ -25,7 +25,7 @@ const (
 	TokenSkipThree   = '{'
 )
 
-func Read(reader io.Reader, memory int) (p *Program, err error) {
+func Read(reader io.Reader, memory int, signed bool) (p *Program, err error) {
 	// Read the entire program
 	data, err := io.ReadAll(reader)
 	if err != nil {
@@ -41,12 +41,13 @@ func Read(reader io.Reader, memory int) (p *Program, err error) {
 	// Finally create the program
 	p = &Program{
 		Opcodes: opcodes,
-		Tape:    Tape{Cells: make([]uint8, memory)},
+		Tape:    Tape{Cells: make([]int8, memory)},
+		Signed:  signed,
 	}
 	return
 }
 
-func Parse(reader io.Reader, memory int, original bool) (p *Program, err error) {
+func Parse(reader io.Reader, memory int, original, signed bool) (p *Program, err error) {
 	var buffered = bufio.NewReader(reader)
 	var line, column = 1, 1
 	var depth int
@@ -250,7 +251,8 @@ func Parse(reader io.Reader, memory int, original bool) (p *Program, err error) 
 	// And create the program
 	p = &Program{
 		Opcodes: opcodes,
-		Tape:    Tape{Cells: make([]uint8, memory)},
+		Tape:    Tape{Cells: make([]int8, memory)},
+		Signed:  signed,
 	}
 	return
 }

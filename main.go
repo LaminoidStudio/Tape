@@ -18,7 +18,7 @@ func main() {
 		memory        = 8
 		seed          int64
 		compile, decompile,
-		original, run, step bool
+		original, run, signed, step bool
 	)
 	flag.StringVar(&input, "input", input, "the input file name instead of stdin")
 	flag.StringVar(&output, "output", output, "the output file name instead of stdout")
@@ -28,6 +28,7 @@ func main() {
 	flag.BoolVar(&decompile, "decompile", decompile, "output commented source code over bytecode")
 	flag.BoolVar(&original, "original", original, "whether to use original brainfuck syntax")
 	flag.BoolVar(&run, "run", run, "whether to run the program")
+	flag.BoolVar(&signed, "signed", signed, "whether the tape cells are signed integers")
 	flag.BoolVar(&step, "step", step, "whether to log every program step")
 	flag.Usage = func() {
 		_, _ = fmt.Fprintln(flag.CommandLine.Output(), "Laminoid Tape Compiler & VM", version)
@@ -41,7 +42,8 @@ Description:
  Only three levels of nesting can be used in original brainfuck mode.
  No strictly matched nesting is required in the enhanced mode.
  Regular numbers, letters and whitespace are ignored in both modes.
- All tape cells are unsigned 8-bit integers that wrap.
+ All tape cells are by default unsigned 8-bit integers that wrap.
+ If signed mode is disabled, the conditionals behave as usual.
  When running while not decompiling, the output is disabled.
 
 Instructions:
@@ -53,12 +55,12 @@ Instructions:
 , input random value into cell
 + increment cell value
 * multiply by 2 (only enhanced)
-[ if cell is zero, skip until 1 (enhanced) or to matching repeat (original)
-( if cell is zero, skip until 2 (only enhanced)
-{ if cell is zero, skip until 3 (only enhanced)
-] if cell is non-zero, repeat until 1 (enhanced) or to matching skip (original)
-) if cell is non-zero, repeat until 2 (only enhanced)
-} if cell is non-zero, repeat until 3 (only enhanced)
+[ if cell is <= 0, skip until 1 (enhanced) or to matching repeat (original)
+( if cell is <= 0, skip until 2 (only enhanced)
+{ if cell is <= 0, skip until 3 (only enhanced)
+] if cell is > 0, repeat until 1 (enhanced) or to matching skip (original)
+) if cell is > 0, repeat until 2 (only enhanced)
+} if cell is > 0, repeat until 3 (only enhanced)
 
 Encoding:
  Two opcodes encoded per byte, where the low nibble precedes the high nibble.
@@ -114,9 +116,9 @@ Usage:`)
 	// Load or compile the program
 	var p *Program
 	if compile {
-		p, err = Parse(reader, memory, original)
+		p, err = Parse(reader, memory, original, signed)
 	} else {
-		p, err = Read(reader, memory)
+		p, err = Read(reader, memory, signed)
 	}
 	if err != nil {
 		panic(err)
@@ -149,22 +151,22 @@ Usage:`)
 		p.Run()
 
 		if step {
-			_, _ = fmt.Fprintf(logger, "%x%c %s: %d%v\n", last/2, func() rune {
+			_, _ = fmt.Fprintf(logger, "%x%c %s: %s\n", last/2, func() rune {
 				if last%2 == 0 {
 					return 'l'
 				}
 				return 'h'
-			}(), p.Opcodes[last].Description(), p.Tape.Pointer, p.Tape.Cells)
+			}(), p.Opcodes[last].Description(), p.Tape.String(signed))
 		}
 	}
 
 	// If not logging every step, output the state after the last one
 	if !step {
-		_, _ = fmt.Fprintf(logger, "%x%c: %d%v\n", last/2, func() rune {
+		_, _ = fmt.Fprintf(logger, "%x%c: %s\n", last/2, func() rune {
 			if last%2 == 0 {
 				return 'l'
 			}
 			return 'h'
-		}(), p.Tape.Pointer, p.Tape.Cells)
+		}(), p.Tape.String(signed))
 	}
 }

@@ -13,6 +13,7 @@ type Program struct {
 	Random  *rand.Rand
 	Pointer int
 	Stopped bool
+	Signed  bool
 }
 
 func (p *Program) Skip(marker uint) {
@@ -81,7 +82,7 @@ func (p *Program) Run() {
 		} else {
 			r = rand.Int()
 		}
-		p.Tape.Set(uint8(r & math.MaxUint8))
+		p.Tape.Set(int8(r & math.MaxUint8))
 	case OpcodeLeft:
 		p.Tape.Move(-1)
 	case OpcodeRight:
@@ -99,27 +100,27 @@ func (p *Program) Run() {
 	case OpcodeMultiply:
 		p.Tape.Set(p.Tape.Get() << 1)
 	case OpcodeSkipOne:
-		if p.Tape.Get() == 0 {
+		if p.Tape.Get() == 0 || p.Signed && p.Tape.Get() < 0 {
 			p.Skip(1)
 		}
 	case OpcodeSkipTwo:
-		if p.Tape.Get() == 0 {
+		if p.Tape.Get() == 0 || p.Signed && p.Tape.Get() < 0 {
 			p.Skip(2)
 		}
 	case OpcodeSkipThree:
-		if p.Tape.Get() == 0 {
+		if p.Tape.Get() == 0 || p.Signed && p.Tape.Get() < 0 {
 			p.Skip(3)
 		}
 	case OpcodeRepeatOne:
-		if p.Tape.Get() != 0 {
+		if !p.Signed && p.Tape.Get() != 0 || p.Tape.Get() > 0 {
 			p.Repeat(1)
 		}
 	case OpcodeRepeatTwo:
-		if p.Tape.Get() != 0 {
+		if !p.Signed && p.Tape.Get() != 0 || p.Tape.Get() > 0 {
 			p.Repeat(2)
 		}
 	case OpcodeRepeatThree:
-		if p.Tape.Get() != 0 {
+		if !p.Signed && p.Tape.Get() != 0 || p.Tape.Get() > 0 {
 			p.Repeat(3)
 		}
 	}
