@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Laminoid Tape</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<body style="font-family: monospace;">
+		<script src="wasm_exec.js"></script>
+		<script src="tape.js"></script>
+		<img src="logo.svg" style="height: 2em; width: auto;">
+		<hr>
+		<textarea id="codeTextArea" spellcheck="false" style="font-family: monospace; width: 100%; height: 40vh;">42  b101010 in cell 0
++**+**+*
+
+>+[ start repeating on set flag
+	< to value
+	( if value gt 0
+		bit is zero
+		> to flag
+		- flag dec  set to 0
+		{ skip past middle loop end
+	)
+	exit on value
+
+	we only land here if the bit is not zero
+	determine if it was zero
+	+ value inc
+	( if value gt 0
+		bit is zero
+		- value dec again
+		> to flag
+		-- flag dec  to -1 to stop
+		{ skip past middle loop end
+	)
+
+	we only land here if bit is one
+	- value dec again
+	>>+ count inc
+	< to flag
+	- dec flag
+
+	must end on flag
+	}
+
+	we land here at the end on flag
+	+ inc flag to repeat
+	<*> shift value up and return to flag
+
+] repeat until the flag is cleared
+.</textarea>
+		<hr>
+		<button onClick="run();" id="runButton" disabled>Run</button>
+		<button onClick="explain();" id="explainButton" disabled>Explain</button>
+		<button onClick="help();" id="helpButton" disabled>Help</button>
+		&emsp;
+		<nobr>
+			<label for="originalCheckbox">Original</label>
+			<input type="checkbox" id="originalCheckbox">
+			&emsp;
+			<label for="signedCheckbox">Signed</label>
+			<input type="checkbox" id="signedCheckbox" checked>
+		</nobr>
+		&emsp;
+		<nobr>
+			<label for="memoryNumber">Memory</label>
+			<input type="number" id="memoryNumber" min="1" max="1048576" step="1" value="8" pattern="[0-9]">
+			&emsp;
+			<label for="seedNumber">Seed</label>
+			<input type="number" id="seedNumber" min="0" max="4294967295" step="1" value="0" pattern="[0-9]">
+		</nobr>
+		<hr>
+		<a id="top" href="#bottom">Go down</a>
+		<pre id="log" style="font-family: monospace; max-width: 100vw; overflow: scroll;">Welcome to Laminoid Tape!
+
+Enter your program code above and click on [Run] to see its single-step output.
+To get a disassembly with explanations for your code, choose [Explain].
+For additional help and an instruction overview, click on [Help].
+
+Have fun!</pre>
+		<a id="bottom" href="#top">Go up</a>
+	</body>
+</html>

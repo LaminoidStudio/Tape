@@ -4,32 +4,34 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io"
 	"math/rand"
 	"os"
+	"strings"
 )
 
-const version = "v1.5"
+const version = "v1.5w"
 
 func main() {
+	// Handle panics
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Printf("panic: %+v\n", err)
+		}
+	}()
+
 	// Handle command-line arguments
 	var (
-		input, output string
-		memory        = 8
-		seed          int64
-		compile, decompile,
-		original, run, signed, step bool
+		code                  string
+		memory                = 8
+		seed                  int64
+		run, original, signed bool
 	)
-	flag.StringVar(&input, "input", input, "the input file name instead of stdin")
-	flag.StringVar(&output, "output", output, "the output file name instead of stdout")
+	flag.StringVar(&code, "code", code, "the code to compile")
 	flag.IntVar(&memory, "memory", memory, "the length of the tape in bytes")
 	flag.Int64Var(&seed, "seed", seed, "predictable random number seed over randomness")
-	flag.BoolVar(&compile, "compile", compile, "input source code instead of bytecode")
-	flag.BoolVar(&decompile, "decompile", decompile, "output commented source code over bytecode")
+	flag.BoolVar(&run, "run", run, "whether to run the code instead of compiling then decompiling it")
 	flag.BoolVar(&original, "original", original, "whether to use original brainfuck syntax")
-	flag.BoolVar(&run, "run", run, "whether to run the program")
 	flag.BoolVar(&signed, "signed", signed, "whether the tape cells are signed integers")
-	flag.BoolVar(&step, "step", step, "whether to log every program step")
 	flag.Usage = func() {
 		_, _ = fmt.Fprintln(flag.CommandLine.Output(), "Laminoid Tape Compiler & VM", version)
 		_, _ = fmt.Fprintln(flag.CommandLine.Output(), `(c) Laminoid Studio (Muessig & Muessig GbR), 2024
@@ -83,59 +85,25 @@ Usage:`)
 		panic(errors.New("at least 1 byte of memory must be allocated"))
 	}
 
-	// Handle input
-	var err error
-	var reader = os.Stdin
-	if input != "" {
-		reader, err = os.Open(input)
-		if err != nil {
-			panic(err)
-		}
-		defer func() {
-			_ = reader.Close()
-		}()
-	}
-
-	// Handle output
-	var writer = io.Writer(os.Stdout)
-	var logger = io.Writer(os.Stdout)
-	if output != "" {
-		writer, err = os.Create(output)
-		if err != nil {
-			panic(err)
-		}
-		defer func() {
-			_ = writer.(*os.File).Close()
-		}()
-	} else if run && !decompile {
-		writer = io.Discard
-	} else {
-		logger = os.Stderr
+	// Verify code input
+	if len(code) < 1 {
+		panic(errors.New("there must be code to compile and run"))
 	}
 
 	// Load or compile the program
 	var p *Program
-	if compile {
-		p, err = Parse(reader, memory, original, signed)
-	} else {
-		p, err = Read(reader, memory, signed)
-	}
+	var err error
+	p, err = Parse(strings.NewReader(code), memory, original, signed)
 	if err != nil {
 		panic(err)
 	}
 
-	// Output the compiled or decompiled program
-	if decompile {
-		err = p.Explain(writer)
-	} else {
-		err = p.Write(writer)
-	}
-	if err != nil {
-		panic(err)
-	}
-
-	// Check if the program should run
+	// Output the decompiled program if not running
 	if !run {
+		err = p.Explain(os.Stdout)
+		if err != nil {
+			panic(err)
+		}
 		return
 	}
 
@@ -150,23 +118,11 @@ Usage:`)
 		last = p.Pointer
 		p.Run()
 
-		if step {
-			_, _ = fmt.Fprintf(logger, "%x%c %s: %s\n", last/2, func() rune {
-				if last%2 == 0 {
-					return 'l'
-				}
-				return 'h'
-			}(), p.Opcodes[last].Description(), p.Tape.String(signed))
-		}
-	}
-
-	// If not logging every step, output the state after the last one
-	if !step {
-		_, _ = fmt.Fprintf(logger, "%x%c: %s\n", last/2, func() rune {
+		_, _ = fmt.Fprintf(os.Stdout, "%x%c %s: %s\n", last/2, func() rune {
 			if last%2 == 0 {
 				return 'l'
 			}
 			return 'h'
-		}(), p.Tape.String(signed))
+		}(), p.Opcodes[last].Description(), p.Tape.String(signed))
 	}
 }
