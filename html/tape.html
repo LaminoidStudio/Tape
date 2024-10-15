@@ -5,12 +5,12 @@
 		<title>Laminoid Tape</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 	</head>
-	<body style="font-family: monospace;">
+	<body style="font-family: monospace; box-sizing: border-box;">
 		<script src="wasm_exec.js"></script>
 		<script src="tape.js"></script>
 		<img src="logo.svg" style="height: 2em; width: auto;">
 		<hr>
-		<textarea id="codeTextArea" spellcheck="false" style="font-family: monospace; width: 100%; height: 40vh;">42  b101010 in cell 0
+		<textarea id="codeTextArea" spellcheck="false" autocapitalize="off" autocorrect="off" style="font-family: monospace; width: 100%; height: 40vh;">42  b101010 in cell 0
 +**+**+*
 
 >+[ start repeating on set flag
@@ -50,9 +50,13 @@
 ] repeat until the flag is cleared
 .</textarea>
 		<hr>
-		<button onClick="run();" id="runButton" disabled>Run</button>
-		<button onClick="explain();" id="explainButton" disabled>Explain</button>
-		<button onClick="help();" id="helpButton" disabled>Help</button>
+		<nobr>
+			<button onClick="run();" id="runButton" disabled>Run</button>
+			<button onClick="explain();" id="explainButton" disabled>Explain</button>
+			<button onClick="copy();" id="copyButton">Copy</button>
+			<button onClick="help();" id="helpButton" disabled>Help</button>
+			<button onClick="reset();" id="resetButton">Reset</button>
+		</nobr>
 		&emsp;
 		<nobr>
 			<label for="originalCheckbox">Original</label>
@@ -75,7 +79,9 @@
 
 Enter your program code above and click on [Run] to see its single-step output.
 To get a disassembly with explanations for your code, choose [Explain].
+Backing up your work can be done using [Copy], then pasting your code in your notes.
 For additional help and an instruction overview, click on [Help].
+If you want to start over and clear all code, use [Reset].
 
 Have fun!</pre>
 		<a id="bottom" href="#top">Go up</a>

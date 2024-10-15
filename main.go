@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-const version = "v1.5w"
+const version = "v1.6w"
 
 func main() {
 	// Handle panics
@@ -46,7 +46,6 @@ Description:
  Regular numbers, letters and whitespace are ignored in both modes.
  All tape cells are by default unsigned 8-bit integers that wrap.
  If signed mode is disabled, the conditionals behave as usual.
- When running while not decompiling, the output is disabled.
 
 Instructions:
 . stop the program
