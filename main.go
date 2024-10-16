@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"os"
 	"strings"
+	"time"
 )
 
 const version = "v1.6w"
@@ -24,10 +25,12 @@ func main() {
 		code                  string
 		memory                = 8
 		seed                  int64
+		timeout               time.Duration
 		run, original, signed bool
 	)
 	flag.StringVar(&code, "code", code, "the code to compile")
 	flag.IntVar(&memory, "memory", memory, "the length of the tape in bytes")
+	flag.DurationVar(&timeout, "timeout", timeout, "the longest duration after which to stop running")
 	flag.Int64Var(&seed, "seed", seed, "predictable random number seed over randomness")
 	flag.BoolVar(&run, "run", run, "whether to run the code instead of compiling then decompiling it")
 	flag.BoolVar(&original, "original", original, "whether to use original brainfuck syntax")
@@ -113,6 +116,7 @@ Usage:`)
 
 	// And actually run the program
 	var last int
+	var start = time.Now()
 	for p.Running() {
 		last = p.Pointer
 		p.Run()
@@ -123,5 +127,9 @@ Usage:`)
 			}
 			return 'h'
 		}(), p.Opcodes[last].Description(), p.Tape.String(signed))
+
+		if timeout > 0 && time.Now().After(start.Add(timeout)) {
+			panic(errors.New("timeout"))
+		}
 	}
 }
