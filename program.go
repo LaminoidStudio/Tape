@@ -88,7 +88,11 @@ func (p *Program) Run() {
 	case OpcodeRight:
 		p.Tape.Move(1)
 	case OpcodeDivide:
-		p.Tape.Set(p.Tape.Get() >> 1)
+		r := p.Tape.Get() >> 1
+		if !p.Signed {
+			r &= 0x7f
+		}
+		p.Tape.Set(r)
 	case OpcodeDecrementTwo:
 		p.Tape.Adjust(-2)
 	case OpcodeDecrementOne:
