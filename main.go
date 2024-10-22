@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const version = "v1.6w"
+const version = "v1.7w"
 
 func main() {
 	// Handle panics
@@ -28,11 +28,11 @@ func main() {
 		timeout               time.Duration
 		run, original, signed bool
 	)
-	flag.StringVar(&code, "code", code, "the code to compile")
+	flag.StringVar(&code, "code", code, "the source code to compile")
 	flag.IntVar(&memory, "memory", memory, "the length of the tape in bytes")
 	flag.DurationVar(&timeout, "timeout", timeout, "the longest duration after which to stop running")
 	flag.Int64Var(&seed, "seed", seed, "predictable random number seed over randomness")
-	flag.BoolVar(&run, "run", run, "whether to run the code instead of compiling then decompiling it")
+	flag.BoolVar(&run, "run", run, "whether to run the code after compilation instead of just decompiling it")
 	flag.BoolVar(&original, "original", original, "whether to use original brainfuck syntax")
 	flag.BoolVar(&signed, "signed", signed, "whether the tape cells are signed integers")
 	flag.Usage = func() {
@@ -62,9 +62,9 @@ Instructions:
 [ if cell is <= 0, skip until 1 (enhanced) or to matching repeat (original)
 ( if cell is <= 0, skip until 2 (only enhanced)
 { if cell is <= 0, skip until 3 (only enhanced)
-] if cell is > 0, repeat until 1 (enhanced) or to matching skip (original)
-) if cell is > 0, repeat until 2 (only enhanced)
-} if cell is > 0, repeat until 3 (only enhanced)
+] if cell is != 0, repeat until 1 (enhanced) or to matching skip (original)
+) if cell is != 0, repeat until 2 (only enhanced)
+} if cell is != 0, repeat until 3 (only enhanced)
 
 Encoding:
  Two opcodes encoded per byte, where the low nibble precedes the high nibble.
@@ -89,7 +89,7 @@ Usage:`)
 
 	// Verify code input
 	if len(code) < 1 {
-		panic(errors.New("there must be code to compile and run"))
+		panic(errors.New("there must be code to compile"))
 	}
 
 	// Load or compile the program

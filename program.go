@@ -116,15 +116,15 @@ func (p *Program) Run() {
 			p.Skip(3)
 		}
 	case OpcodeRepeatOne:
-		if !p.Signed && p.Tape.Get() != 0 || p.Tape.Get() > 0 {
+		if p.Tape.Get() != 0 {
 			p.Repeat(1)
 		}
 	case OpcodeRepeatTwo:
-		if !p.Signed && p.Tape.Get() != 0 || p.Tape.Get() > 0 {
+		if p.Tape.Get() != 0 {
 			p.Repeat(2)
 		}
 	case OpcodeRepeatThree:
-		if !p.Signed && p.Tape.Get() != 0 || p.Tape.Get() > 0 {
+		if p.Tape.Get() != 0 {
 			p.Repeat(3)
 		}
 	}
