@@ -59,12 +59,12 @@ Instructions:
 , input random value into cell
 + increment cell value
 * multiply by 2 (only enhanced)
-[ if cell is <= 0, skip until 1 (enhanced) or to matching repeat (original)
-( if cell is <= 0, skip until 2 (only enhanced)
-{ if cell is <= 0, skip until 3 (only enhanced)
-] if cell is != 0, repeat until 1 (enhanced) or to matching skip (original)
-) if cell is != 0, repeat until 2 (only enhanced)
-} if cell is != 0, repeat until 3 (only enhanced)
+[ if cell is == 0, skip until 1 (enhanced) or to matching repeat (original)
+( if cell is == 0, skip until 2 (only enhanced)
+{ if cell is == 0, skip until 3 (only enhanced)
+] if cell is > 0, repeat until 1 (enhanced) or to matching skip (original)
+) if cell is > 0, repeat until 2 (only enhanced)
+} if cell is > 0, repeat until 3 (only enhanced)
 
 Encoding:
  Two opcodes encoded per byte, where the low nibble precedes the high nibble.
